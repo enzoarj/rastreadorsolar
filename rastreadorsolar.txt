@@ -1,0 +1,97 @@
+#include <Servo.h> //Biblioteca Utilizada
+// Definindo a movimentação horizontal de 180° máximo
+Servo horizontal;
+int servoh = 180;
+//Definindo a mínimo e máximo do Servo 
+int servohLimitHigh = 180;
+int servohLimitLow = 15;
+//Definindo a rotação do servo motor vertical
+Servo vertical;
+int servov = 45; // Valor inicial 
+//Definindo máximo e mínimo do servo motor vertical
+int servovLimitHigh = 165; 
+int servovLimitLow = 15;
+// Pino analógico dos LDRs
+//int ldrlt = 0; //LDR Pino analógico (A0)
+//int ldrrt = 1; //LDR Pino analógico (A1)
+//int ldrld = 2; //LDR Pino analógico (A2)
+//int ldrrd = 3; //LDR Pino analógico (A3)
+int aZero = 0; //LDR Pino analógico (A0)
+int aUm = 1; //LDR Pino analógico (A1)
+int aDois = 2; //LDR Pino analógico (A2)
+int aTres = 3; //LDR Pino analógico (A3)
+void setup()//Configuração inicial
+{
+Serial.begin(9600); //Porta Serial do Arduino
+//Conexao das portas Digitais
+horizontal.attach(9);//Porta (-9)
+vertical.attach(10);//Porta (-10)
+horizontal.write(180);
+vertical.write(80);
+delay(3000); //Tempo de espera 
+}
+void loop()
+{
+int lt = analogRead(aZero); // Valores de variáveis 
+int rt = analogRead(aUm); // 
+int ld = analogRead(aDois); // 
+int rd = analogRead(aTres); // 
+int dtime = 10;
+int tol = 50;
+//Realizando cálculos para determinar os valores de rotação
+int avt = (lt + rt) / 2; // Valor LDR superior 
+int avd = (ld + rd) / 2; // Valor LDR inferior
+int avl = (lt + ld) / 2; // Valor LDR esquerda
+int avr = (rt + rd) / 2; // Valor LDR direita 
+int dvert = avt - avd; // Verificando a diferença de cima pra baixo
+int dhoriz = avl - avr;// Verificando a diferença da esquerda e direita
+//Imprimindo os valores da captação do LDR
+Serial.print("LDR1: ");
+Serial.print(avt);
+Serial.print(" LDR1: ");
+Serial.print(avd);
+Serial.print(" LDR2: ");
+Serial.print(avl);
+Serial.print(" LDR3: ");
+Serial.print(avr);
+Serial.print(" time: ");
+Serial.print(dtime);
+Serial.print("Tempo: ");
+Serial.print(tol);
+Serial.println(" ");
+//Detectando maior entrada de luz do LDR
+if (-1*tol > dvert || dvert > tol){
+  if (avt > avd){
+	  servov = ++servov;
+	  if (servov > servovLimitHigh){
+		  servov = servovLimitHigh;
+	  }
+  }
+  else if (avt < avd){
+	servov= --servov;
+	if (servov < servovLimitLow) { servov = servovLimitLow; } } vertical.write(servov); } if (-1*tol > dhoriz || dhoriz > tol)
+{
+if (avl > avr)
+{
+servoh = --servoh;
+if (servoh < servohLimitLow)
+{
+servoh = servohLimitLow;
+}
+}
+else if (avl < avr) { servoh = ++servoh; if (servoh > servohLimitHigh)
+{
+servoh = servohLimitHigh;
+}
+}
+else if (avl = avr)
+{
+// Loopin
+}
+horizontal.write(servoh);
+}
+delay(dtime);
+}
+
+
+
